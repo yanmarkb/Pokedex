@@ -1,6 +1,5 @@
 const pokedex = document.getElementById("pokedex");
-
-console.log(pokedex);
+const searchInput = document.getElementById("poke");
 
 const fetchPokemon = () => {
 	const promises = [];
@@ -17,6 +16,10 @@ const fetchPokemon = () => {
 			type: data.types.map((type) => type.type.name).join(", "),
 		}));
 		displayPokemon(pokemon);
+		searchInput.addEventListener(
+			"keyup",
+			debounce((event) => searchPokemon(pokemon, event), 500)
+		);
 	});
 };
 
@@ -37,4 +40,24 @@ const displayPokemon = (pokemon) => {
 	pokedex.innerHTML = pokemonHTMLString;
 };
 
+const searchPokemon = (pokemon, event) => {
+	const searchString = event.target.value.toLowerCase();
+	const filteredPokemon = pokemon.filter((pokeman) => {
+		return pokeman.name.toLowerCase().includes(searchString);
+	});
+	displayPokemon(filteredPokemon);
+};
+
 fetchPokemon();
+
+function debounce(func, wait) {
+	let timeout;
+	return function (...args) {
+		const context = this;
+		clearTimeout(timeout);
+		timeout = setTimeout(() => {
+			timeout = null;
+			func.apply(context, args);
+		}, wait);
+	};
+}
